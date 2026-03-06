@@ -1,0 +1,211 @@
+/* ======================================
+   SBI TV DISPLAY — FINAL FIT SCREEN
+   ====================================== */
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(180deg,#0b1f3a,#08162a);
+    color: white;
+}
+
+body {
+    display:block;
+}
+
+/* ===== WRAPPER ===== */
+
+.tv-wrapper {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== HEADER ===== */
+
+.tv-header {
+    height: 85px;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(90deg,#0c2d5a,#091c38);
+}
+
+/* brand container */
+.brand-left {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+/* SBI logo */
+.brand-left img:first-child {
+    height: 52px;
+}
+
+/* SIG logo (endorsement) */
+.brand-left img:last-child {
+    height: 46px; /* ← diperbesar lagi */
+    opacity: 0.95;
+}
+
+/* title */
+.room-title {
+    font-size: 44px;
+    font-weight: 700;
+}
+
+.clock {
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+/* ===== BODY ===== */
+
+.tv-body {
+    flex: 1;
+    overflow: hidden; /* penting */
+    padding: 16px 22px;
+    display: grid;
+    grid-template-columns: 45% 55%;
+    gap: 18px;
+}
+
+/* ===== PANELS ===== */
+
+.left-panel,
+.right-panel {
+    background: rgba(0,0,0,0.35);
+    border-radius: 14px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== LEFT ===== */
+
+.current-title {
+    font-size: 24px;
+}
+
+.current-status {
+    margin-top: 20px;
+    font-size: 34px;
+    font-weight: bold;
+}
+
+.left-panel h2 {
+    font-size: 30px;
+}
+
+.info {
+    font-size: 28px;
+    margin-top: 10px;
+}
+
+/* ===== RIGHT ===== */
+
+.right-panel {
+    overflow: hidden;
+    position: relative;
+}
+
+.schedule-title {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+#time-indicator {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #ef4444;
+    z-index: 10;
+    pointer-events: none;
+}
+
+#timeline {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+/* IMPORTANT:
+   auto-fit semua slot ke tinggi layar */
+.schedule-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* slot row */
+.slot-row {
+    flex: 1;                 /* MAGIC LINE */
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    min-height: 0;
+}
+
+.slot-row div:first-child {
+    width: 110px;
+    font-size: 24px;
+}
+
+.slot-row div:last-child {
+    font-size: 24px;
+}
+
+/* time */
+.schedule-time {
+    width: 80px;
+    font-size: 18px;
+    opacity: 0.85;
+}
+
+/* description */
+.schedule-desc {
+    flex: 1;
+    font-size: 18px;
+}
+
+/* ===== STATUS ===== */
+
+.slot-row.available {
+    color: #7CFFB2;
+}
+
+.slot-row.past {
+    opacity: 0.35;
+}
+
+.slot-row.active {
+    color: #FFD166;
+    font-weight: 700;
+    font-size: 22px;
+}
+
+.slot-row.future {
+    opacity: 0.9;
+}
+
+/* ===== FOOTER ===== */
+
+.tv-footer {
+    height: 50px;
+    flex-shrink: 0; /* supaya tidak ketekan */
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+}
