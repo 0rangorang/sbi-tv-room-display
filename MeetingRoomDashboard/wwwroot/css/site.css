@@ -1,0 +1,14 @@
+/* Background seluruh halaman */
+body {
+    background-color: #f4f6f9;
+}
+
+/* Card lebih rounded */
+.card {
+    border-radius: 12px;
+}
+
+/* Judul card lebih tegas */
+.card-title {
+    font-weight: bold;
+}

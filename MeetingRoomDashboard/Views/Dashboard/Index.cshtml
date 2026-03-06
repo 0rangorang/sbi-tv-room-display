@@ -1,0 +1,57 @@
+@model List<MeetingRoomDashboard.Models.MeetingRoom>
+
+@{
+    ViewData["Title"] = "Meeting Room Dashboard";
+}
+
+<!-- Auto refresh setiap 30 detik -->
+<meta http-equiv="refresh" content="30" />
+
+<div class="container mt-4">
+    <h2 class="mb-4">Meeting Room Occupancy</h2>
+
+    <!-- Bootstrap Grid System -->
+    <div class="row">
+
+        @foreach (var room in Model)
+        {
+            <!-- col-md-4 artinya 1 baris isi 3 card -->
+            <div class="col-md-4 mb-4">
+
+                <!-- Bootstrap Card -->
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+
+                        <!-- Judul Ruangan -->
+                        <h5 class="card-title">@room.RoomName</h5>
+
+                        <!-- Badge Status -->
+                        @if (room.IsOccupied)
+                        {
+                            <!-- bg-danger = merah -->
+                            <span class="badge bg-danger mb-2">
+                                Occupied
+                            </span>
+                        }
+                        else
+                        {
+                            <!-- bg-success = hijau -->
+                            <span class="badge bg-success mb-2">
+                                Available
+                            </span>
+                        }
+
+                        <!-- Detail Data -->
+                        <p><strong>User:</strong> @room.CurrentUser</p>
+                        <p><strong>Activity:</strong> @room.Activity</p>
+                        <p><strong>Time:</strong> @room.Time</p>
+                        <p><strong>Next:</strong> @room.NextSchedule</p>
+
+                    </div>
+                </div>
+
+            </div>
+        }
+
+    </div>
+</div>
