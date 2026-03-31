@@ -1,0 +1,230 @@
+@model Sbi.RoomDisplay.Models.RoomScheduleViewModel
+
+@{
+    Layout = "~/Views/Shared/_TvLayout.cshtml";
+    var showNextBlock = Model.NextBooking != null;
+    var nextCardCompact = Model.CurrentBooking != null && Model.NextBooking != null;
+    var showDataStatusDetail = !string.IsNullOrWhiteSpace(Model.DataStatusDetail);
+
+    string GetMeetingTypeCss(string meetingType)
+    {
+        return meetingType?.ToUpperInvariant() switch
+        {
+            "EXTERNAL" => "external",
+            "INTERNAL" => "internal",
+            "BOD_BOC" => "bod-boc",
+            "BOD/BOC" => "bod-boc",
+            _ => "internal"
+        };
+    }
+
+    string GetMeetingTypeLabel(string meetingType)
+    {
+        return meetingType?.ToUpperInvariant() switch
+        {
+            "EXTERNAL" => "EXTERNAL",
+            "INTERNAL" => "INTERNAL",
+            "BOD_BOC" => "BOD/BOC",
+            "BOD/BOC" => "BOD/BOC",
+            _ => string.Empty
+        };
+    }
+}
+
+@section RoomTitle {
+    @Model.RoomName
+}
+
+<div class="tv-body">
+    <div class="left-panel">
+        <h2 class="current-title">Current Activity</h2>
+
+        <div class="left-panel-badges">
+            <div id="roomStatusBadge"
+                 class="status-pill @(Model.IsRoomInUse ? "in-use" : "available")">
+                @(Model.IsRoomInUse ? "IN USE" : "AVAILABLE")
+            </div>
+
+            <div id="dataFreshnessBadge"
+                 class="data-freshness @Model.DataStatusClass">
+                @Model.DataStatusText
+            </div>
+        </div>
+
+        <div id="dataFreshnessMeta"
+             class="data-freshness-meta @(showDataStatusDetail ? "" : "is-hidden")">
+            @if (showDataStatusDetail)
+            {
+                @Model.DataStatusDetail
+            }
+        </div>
+
+        <div class="current-card">
+            <div class="current-main">
+                <div class="current-main-title" id="currentTitleText">
+                    @(Model.CurrentBooking != null
+                        ? Model.CurrentBooking.DisplayTitle
+                        : "Room Available")
+                </div>
+
+                <div id="currentMeetingTypeBadge"
+                    class="meeting-type-badge @(Model.CurrentBooking != null ? GetMeetingTypeCss(Model.CurrentBooking.MeetingType) : "") @(Model.CurrentBooking != null ? "" : "is-hidden")">
+                    @if (Model.CurrentBooking != null)
+                    {
+                        @GetMeetingTypeLabel(Model.CurrentBooking.MeetingType)
+                    }
+                </div>
+
+                <div class="current-meta current-meta-created @(Model.CurrentBooking != null ? "" : "is-hidden")"
+                    id="currentPicRow">
+                    @if (Model.CurrentBooking != null)
+                    {
+                        <text>Created by: @Model.CurrentBooking.PIC</text>
+                    }
+                </div>
+
+                <div class="current-meta current-meta-time @(Model.CurrentBooking != null ? "" : "is-hidden")"
+                    id="currentTimeRow">
+                    @if (Model.CurrentBooking != null)
+                    {
+                        <text>
+                            @Model.CurrentBooking.StartTime.ToString("HH:mm")
+                            -
+                            @Model.CurrentBooking.EndTime.ToString("HH:mm")
+                        </text>
+                    }
+                </div>
+            </div>
+
+            <div class="next-card @(showNextBlock ? (nextCardCompact ? "compact" : "expanded") : "is-hidden")"
+                id="nextBookingBlock">
+                <div class="next-label">Next Meeting</div>
+
+                <div class="next-title" id="nextTitleText">
+                    @if (showNextBlock)
+                    {
+                        @Model.NextBooking.DisplayTitle
+                    }
+                </div>
+
+                <div id="nextMeetingTypeBadge"
+                    class="meeting-type-badge @(showNextBlock ? GetMeetingTypeCss(Model.NextBooking.MeetingType) : "") @(showNextBlock ? "" : "is-hidden")">
+                    @if (showNextBlock)
+                    {
+                        @GetMeetingTypeLabel(Model.NextBooking.MeetingType)
+                    }
+                </div>
+
+                <div class="next-meta next-meta-created @((showNextBlock && !nextCardCompact) ? "" : "is-hidden")" id="nextPicRow">
+                    @if (showNextBlock)
+                    {
+                        <text>Created by: @Model.NextBooking.PIC</text>
+                    }
+                </div>
+
+                <div class="next-meta next-meta-time" id="nextTimeRow">
+                    @if (showNextBlock)
+                    {
+                        <text>
+                            @Model.NextBooking.StartTime.ToString("HH:mm")
+                            -
+                            @Model.NextBooking.EndTime.ToString("HH:mm")
+                        </text>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="right-panel">
+        <h2 class="schedule-title">Today's Schedule</h2>
+
+        <div id="timeline">
+            @foreach (var slot in Model.Slots)
+            {
+                var cssClass = slot.Status.ToString().ToLower();
+
+                <div class="slot-row @cssClass">
+                    <div class="schedule-time">@slot.Time.ToString("HH:mm")</div>
+                    <div class="schedule-desc" title="@slot.Description">
+                        @slot.Description
+                    </div>
+                </div>
+            }
+
+            <div id="time-indicator"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+window.serverNow = new Date("@Model.ServerNow.ToString("o")");
+window.tvRefreshIntervalMs = 10000;
+
+function updateTimeIndicator() {
+    const slots = document.querySelectorAll(".slot-row");
+    const indicator = document.getElementById("time-indicator");
+
+    if (!slots.length || !indicator) return;
+
+    const now = window.serverNow ?? new Date();
+
+    const startHour = 7;
+    const startMinute = 0;
+
+    const endHour = 18;
+    const endMinute = 30;
+
+    const startTotalMinutes = (startHour * 60) + startMinute;
+    const endTotalMinutes = (endHour * 60) + endMinute;
+    const totalMinutes = endTotalMinutes - startTotalMinutes;
+
+    const nowTotalMinutes = (now.getHours() * 60) + now.getMinutes();
+    const currentMinutes = nowTotalMinutes - startTotalMinutes;
+
+    const percent = Math.max(0, Math.min(1, currentMinutes / totalMinutes));
+
+    const firstSlot = slots[0];
+    const lastSlot = slots[slots.length - 1];
+
+    const startY = firstSlot.offsetTop;
+    const endY = lastSlot.offsetTop;
+
+    const position = startY + (endY - startY) * percent;
+    indicator.style.top = position + "px";
+}
+
+function updateClock() {
+    if (!window.serverNow) return;
+
+    const now = new Date(window.serverNow);
+
+    const time = now.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+    });
+
+    const clock = document.getElementById("clock");
+    if (clock) {
+        clock.innerText = time;
+    }
+
+    window.serverNow = new Date(now.getTime() + 1000);
+}
+
+window.addEventListener("load", () => {
+    updateTimeIndicator();
+    updateClock();
+
+    setInterval(() => {
+        requestAnimationFrame(updateTimeIndicator);
+    }, 1000);
+
+    setInterval(updateClock, 1000);
+});
+</script>
+
+<script src="~/js/tv-refresh.js"></script>
+}
